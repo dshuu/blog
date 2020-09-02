@@ -7524,9 +7524,9 @@ vuepress-plugin-smooth-scroll@^0.0.3:
     smoothscroll-polyfill "^0.4.3"
 
 vuepress-theme-yolo@^1.0.1:
-  version "1.0.5"
-  resolved "https://registry.yarnpkg.com/vuepress-theme-yolo/-/vuepress-theme-yolo-1.0.5.tgz#81e3b8ce14bba817e988d17185670d137478e51d"
-  integrity sha512-c2cvpCkV4sFwCCIqkq6aAjYuRd/bvQaANH/n1APIMWxfji23RTIr9qZElABz58tDy0o1eecN2GN2LwbEYC0RmQ==
+  version "1.0.6"
+  resolved "https://registry.yarnpkg.com/vuepress-theme-yolo/-/vuepress-theme-yolo-1.0.6.tgz#3cca912e606f2db07cd22d6c3f2051a1900a7a76"
+  integrity sha512-ftZpw8KrgsHpXWVq+6BP8/uYTaJPFsDoSLAy6tnBDIE1BWiWzdSOQjw9vVht7T7rTDcPuC7+JZixw8MxhSSyUA==
 
 vuepress@^1.5.4:
   version "1.5.4"
