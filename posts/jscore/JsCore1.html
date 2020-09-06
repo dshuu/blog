@@ -1,0 +1,34 @@
+<!DOCTYPE html>
+<html lang="en-US">
+  <head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width,initial-scale=1">
+    <title>JsCore之类型、内存、垃圾回收 | YOLO</title>
+    <meta name="generator" content="VuePress 1.5.4">
+    <meta name="viewport" content="width=device-width,initial-scale=1.0">
+    <link href="//cdn.bootcss.com/font-awesome/4.5.0/css/font-awesome.min.css" rel="stylesheet">
+    
+    <meta name="description" content="dshu`s blog">
+    <link rel="preload" href="/blog/assets/css/0.styles.3db8697d.css" as="style"><link rel="preload" href="/blog/assets/js/app.342883e5.js" as="script"><link rel="preload" href="/blog/assets/js/3.cde5f00a.js" as="script"><link rel="preload" href="/blog/assets/js/7.7852e444.js" as="script"><link rel="prefetch" href="/blog/assets/js/2.60e3e3a8.js"><link rel="prefetch" href="/blog/assets/js/4.0c84c48a.js"><link rel="prefetch" href="/blog/assets/js/5.111f1b2a.js"><link rel="prefetch" href="/blog/assets/js/6.e3b7ff19.js">
+    <link rel="stylesheet" href="/blog/assets/css/0.styles.3db8697d.css">
+  </head>
+  <body>
+    <div id="app" data-server-rendered="true"><section class="post-detail wrapper"><article><header><h1 id="post-title">JsCore之类型、内存、垃圾回收</h1> <div class="post-info"><span><i aria-hidden="true" class="fa fa-clock-o"></i>2020-09-01</span> <span><i aria-hidden="true" class="fa fa-tags"></i>技术</span></div></header> <section class="post-content"></section> <div class="content__default"><h3 id="js-数据类型">Js 数据类型</h3> <p>首先，要明白的是基础类型和对象(引用)类型，这个是前端最基础的东西。类型之间转换是 Js 中很不容易理解的地方之一了。</p> <h4 id="原始类型">原始类型</h4> <p>原始类型值是无法修改的，复制的是值，比较是值的比较。原始类型现在一共有 7 种:Number,String,Boolean,Symbol,BigInt,Null,Undefined</p> <div class="language-js extra-class"><pre class="language-js"><code><span class="token keyword">let</span> str <span class="token operator">=</span> <span class="token string">'abc'</span>
+str<span class="token punctuation">[</span><span class="token number">1</span><span class="token punctuation">]</span> <span class="token operator">=</span> <span class="token string">'e'</span>
+console<span class="token punctuation">.</span><span class="token function">log</span><span class="token punctuation">(</span>str<span class="token punctuation">)</span> <span class="token comment">// 还是'abc',str的值是不会修改，str='aec'是重新赋值</span>
+<span class="token keyword">let</span> str1 <span class="token operator">=</span> str
+str1 <span class="token operator">=</span> <span class="token string">'aec'</span>◊
+console<span class="token punctuation">.</span><span class="token function">log</span><span class="token punctuation">(</span>str1<span class="token punctuation">,</span> str<span class="token punctuation">)</span> <span class="token comment">// str1变为'aec',str还是'abc'</span>
+str1 <span class="token operator">=</span> <span class="token string">'abc'</span>
+str <span class="token operator">===</span> str1 <span class="token comment">//true,值的比较</span>
+</code></pre></div><h4 id="对象类型">对象类型</h4> <p>对象类型的赋值是引用指针的赋值，属性可以修改，复制的是指针。比较是指针的比较，所以没有两个对象是相等的。</p> <div class="language-js extra-class"><pre class="language-js"><code>  <span class="token punctuation">[</span><span class="token number">1</span><span class="token punctuation">,</span><span class="token number">2</span><span class="token punctuation">,</span><span class="token number">3</span><span class="token punctuation">]</span> <span class="token operator">===</span> <span class="token punctuation">[</span><span class="token number">1</span><span class="token punctuation">,</span><span class="token number">2</span><span class="token punctuation">,</span><span class="token number">3</span><span class="token punctuation">]</span> <span class="token comment">//false</span>
+  <span class="token punctuation">{</span>a<span class="token operator">:</span><span class="token number">1</span><span class="token punctuation">}</span><span class="token operator">===</span><span class="token punctuation">{</span>a<span class="token operator">:</span><span class="token number">1</span><span class="token punctuation">}</span> <span class="token comment">//false</span>
+
+  <span class="token keyword">let</span>  obj <span class="token operator">=</span> <span class="token punctuation">{</span>a<span class="token operator">:</span><span class="token number">1</span><span class="token punctuation">}</span>
+  <span class="token keyword">let</span> obj1 <span class="token operator">=</span> obj
+  obj1<span class="token punctuation">.</span>a <span class="token operator">=</span> <span class="token number">2</span>
+  obj<span class="token punctuation">.</span>a <span class="token comment">//   1 因为同一个指针指向的对象属性改变了</span>
+</code></pre></div><p>对象拷贝的几种方法</p> <h4 id="类型转换">类型转换</h4> <p>虽然平时我们不会这么写，且现在 TS 越老越普及，大家都用===了，不过还是要理解下，毕竟说不定什么时候就出这个 bug 了呢。</p> <h4 id="类型判断">类型判断</h4> <h3 id="js-中的内存">Js 中的内存</h3> <h3 id="垃圾回收机制">垃圾回收机制</h3></div></article></section><div class="global-ui"></div></div>
+    <script src="/blog/assets/js/app.342883e5.js" defer></script><script src="/blog/assets/js/3.cde5f00a.js" defer></script><script src="/blog/assets/js/7.7852e444.js" defer></script>
+  </body>
+</html>
