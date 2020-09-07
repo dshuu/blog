@@ -2,7 +2,7 @@
 layout: detail
 title: JsCore之类型、内存、垃圾回收
 tag: 技术
-date: '2020-09-01'
+date: "2020-09-01"
 ---
 
 ### Js 数据类型
@@ -38,12 +38,11 @@ str === str1 //true,值的比较
   obj.a //   1 因为同一个指针指向的对象属性改变了
 ```
 
-对象拷贝的几种方法
+对象拷贝分为[浅拷贝](https://github.com/dshuu/hierarchy/blob/master/pages/js/2.%E5%8F%98%E9%87%8F%E3%80%81%E4%BD%9C%E7%94%A8%E5%9F%9F%E4%B8%8E%E5%86%85%E5%AD%98/%E6%B5%85%E6%8B%B7%E8%B4%9D.html),和[深拷贝](https://github.com/dshuu/hierarchy/blob/master/pages/js/2.%E5%8F%98%E9%87%8F%E3%80%81%E4%BD%9C%E7%94%A8%E5%9F%9F%E4%B8%8E%E5%86%85%E5%AD%98/%E6%B7%B1%E6%8B%B7%E8%B4%9D.html)
 
 #### 类型转换
 
-虽然平时我们不会这么写，且现在 TS 越老越普及，大家都用===了，不过还是要理解下，毕竟说不定什么时候就出这个 bug 了呢。
-
+虽然平时我们不会这么写，且现在 TS 越来越普及，大家都用===了，不过还是要理解下，毕竟说不定什么时候就出这个 bug 了呢。
 
 #### 类型判断
 
