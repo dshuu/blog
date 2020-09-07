@@ -1,0 +1,92 @@
+<!DOCTYPE html>
+<html lang="en-US">
+  <head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width,initial-scale=1">
+    <title>web 页面加载性能 | YOLO</title>
+    <meta name="generator" content="VuePress 1.5.4">
+    <meta name="viewport" content="width=device-width,initial-scale=1.0">
+    <!-- <link href="//cdn.bootcss.com/font-awesome/4.5.0/css/font-awesome.min.css" rel="stylesheet"> -->
+    
+    <meta name="description" content="dshu`s blog">
+    <link rel="preload" href="/blog/assets/css/0.styles.2a2a5349.css" as="style"><link rel="preload" href="/blog/assets/js/app.e844dcec.js" as="script"><link rel="preload" href="/blog/assets/js/3.cde5f00a.js" as="script"><link rel="preload" href="/blog/assets/js/8.1c0b63e6.js" as="script"><link rel="prefetch" href="/blog/assets/js/2.60e3e3a8.js"><link rel="prefetch" href="/blog/assets/js/4.0c84c48a.js"><link rel="prefetch" href="/blog/assets/js/5.111f1b2a.js"><link rel="prefetch" href="/blog/assets/js/6.e3b7ff19.js"><link rel="prefetch" href="/blog/assets/js/7.061d51fe.js">
+    <link rel="stylesheet" href="/blog/assets/css/0.styles.2a2a5349.css">
+  </head>
+  <body>
+    <div id="app" data-server-rendered="true"><section class="post-detail wrapper"><article><header><h1 id="post-title">web 页面加载性能</h1> <div class="post-info"><span><i aria-hidden="true" class="fa fa-clock-o"></i>2020-09-01</span> <span><i aria-hidden="true" class="fa fa-tags"></i>优化</span></div></header> <section class="post-content"></section> <div class="content__default"><h3 id="为什么要在乎性能">为什么要在乎性能</h3> <p>首先要清楚性能的重要性，快一点慢一点影响大吗？想象一下，一个用户打开竞品 1 秒不到，打开你司网站等了 3 秒，用户选谁？归根结底，技术是要为了业务服务的，也就是性能最终会与利益相关。用户体验不好，可能就直接放弃使用了，且长期内不会再尝试。
+下面我们按照用户使用体验，列出四个指标:白屏时间、首屏时间、可操作性时间、总下载时间</p> <h3 id="白屏时间">白屏时间</h3> <p>白屏时间一般是指用户从输入 Url 或者点击跳转后，到首次看到内容(无论是啥)的时间。</p> <blockquote><p>chrome 可以通过特有的 firstPaintTime 来获取首次渲染的时间戳(秒)</p></blockquote> <div class="language-js extra-class"><pre class="language-js"><code><span class="token keyword">const</span> firstPaintTime <span class="token operator">=</span>
+  window<span class="token punctuation">.</span>chrome<span class="token punctuation">.</span><span class="token function">loadTimes</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">.</span>firstPaintTime <span class="token operator">*</span> <span class="token number">1000</span> <span class="token operator">-</span>
+  window<span class="token punctuation">.</span>performance<span class="token punctuation">.</span>timing<span class="token punctuation">.</span>navigationStart<span class="token punctuation">;</span>
+</code></pre></div><p>对于非 chrome 浏览器或者低版本浏览器，首次渲染时间，可以通过头部资源加载的时间来统计。根据浏览器渲染原理，那可以通过在头部末尾加上一个时间戳来判断。</p> <div class="language-js extra-class"><pre class="language-js"><code><span class="token operator">&lt;</span><span class="token operator">!</span><span class="token constant">DOCTYPE</span> html<span class="token operator">&gt;</span>
+<span class="token operator">&lt;</span>html lang<span class="token operator">=</span><span class="token string">&quot;en&quot;</span><span class="token operator">&gt;</span>
+<span class="token operator">&lt;</span>head<span class="token operator">&gt;</span>
+  <span class="token operator">&lt;</span>meta charset<span class="token operator">=</span><span class="token string">&quot;UTF-8&quot;</span><span class="token operator">&gt;</span>
+  <span class="token operator">&lt;</span>script<span class="token operator">&gt;</span>
+  <span class="token keyword">const</span> startTime <span class="token operator">=</span> <span class="token operator">+</span><span class="token keyword">new</span> <span class="token class-name">Date</span>
+  <span class="token operator">&lt;</span><span class="token operator">/</span>script<span class="token operator">&gt;</span>
+<span class="token operator">&lt;</span><span class="token operator">/</span>head<span class="token operator">&gt;</span>
+<span class="token operator">&lt;</span>body<span class="token operator">&gt;</span>
+  <span class="token operator">&lt;</span>script<span class="token operator">&gt;</span>
+  <span class="token keyword">const</span> endTime <span class="token operator">=</span> <span class="token operator">+</span><span class="token keyword">new</span> <span class="token class-name">Date</span>
+  <span class="token keyword">const</span> loadTime <span class="token operator">=</span> endTime<span class="token operator">-</span>startTime<span class="token comment">//最终结果比chrome下少几十ms</span>
+  <span class="token operator">&lt;</span><span class="token operator">/</span>script<span class="token operator">&gt;</span>
+<span class="token operator">&lt;</span><span class="token operator">/</span>body<span class="token operator">&gt;</span>
+<span class="token operator">&lt;</span><span class="token operator">/</span>html<span class="token operator">&gt;</span>
+</code></pre></div><h3 id="首屏时间">首屏时间</h3> <p>首屏时间是用户感知中，近似加载完成的时间，包括 iframe，图片等，以最后一个资源完成的时间为准。我们可以以<a href="https://developer.mozilla.org/zh-CN/docs/Web/Events/DOMContentLoaded" target="_blank" rel="noopener noreferrer">DOMContentLoaded<svg xmlns="http://www.w3.org/2000/svg" aria-hidden="true" x="0px" y="0px" viewBox="0 0 100 100" width="15" height="15" class="icon outbound"><path fill="currentColor" d="M18.8,85.1h56l0,0c2.2,0,4-1.8,4-4v-32h-8v28h-48v-48h28v-8h-32l0,0c-2.2,0-4,1.8-4,4v56C14.8,83.3,16.6,85.1,18.8,85.1z"></path> <polygon fill="currentColor" points="45.7,48.7 51.3,54.3 77.2,28.5 77.2,37.2 85.2,37.2 85.2,14.9 62.8,14.9 62.8,22.9 71.5,22.9"></polygon></svg></a>或最后一张图片加载完成的时间来作为指标</p> <div class="language-js extra-class"><pre class="language-js"><code><span class="token keyword">function</span> <span class="token function">getEleOffsetTop</span><span class="token punctuation">(</span><span class="token parameter">ele</span><span class="token punctuation">)</span> <span class="token punctuation">{</span>
+  <span class="token keyword">let</span> offsetTop <span class="token operator">=</span> ele<span class="token punctuation">.</span>offsetTop<span class="token punctuation">;</span>
+  <span class="token keyword">if</span> <span class="token punctuation">(</span>ele<span class="token punctuation">.</span>offsetParent <span class="token operator">!==</span> <span class="token keyword">null</span><span class="token punctuation">)</span> <span class="token punctuation">{</span>
+    offsetTop <span class="token operator">+=</span> <span class="token function">getEleOffsetTop</span><span class="token punctuation">(</span>ele<span class="token punctuation">.</span>offsetParent<span class="token punctuation">)</span><span class="token punctuation">;</span>
+  <span class="token punctuation">}</span>
+  <span class="token keyword">return</span> offsetTop<span class="token punctuation">;</span>
+<span class="token punctuation">}</span>
+<span class="token keyword">let</span> domContentLoadedTime<span class="token punctuation">,</span>
+  firstScreenTime<span class="token punctuation">,</span>
+  firstScreenImgs <span class="token operator">=</span> <span class="token punctuation">[</span><span class="token punctuation">]</span><span class="token punctuation">,</span>
+  allImgLoaded <span class="token operator">=</span> <span class="token boolean">false</span><span class="token punctuation">,</span>
+  fistScreenHeight <span class="token operator">=</span> window<span class="token punctuation">.</span>screen<span class="token punctuation">.</span>height<span class="token punctuation">;</span>
+document<span class="token punctuation">.</span><span class="token function">addEventListener</span><span class="token punctuation">(</span><span class="token string">&quot;DOMContentLoaded&quot;</span><span class="token punctuation">,</span> <span class="token punctuation">(</span><span class="token parameter">e</span><span class="token punctuation">)</span> <span class="token operator">=&gt;</span> <span class="token punctuation">{</span>
+  domContentLoadedTime <span class="token operator">=</span> <span class="token operator">+</span><span class="token keyword">new</span> <span class="token class-name">Date</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+  <span class="token comment">// 找到所有的图片</span>
+  <span class="token keyword">let</span> allImgs <span class="token operator">=</span> document<span class="token punctuation">.</span><span class="token function">querySelector</span><span class="token punctuation">(</span><span class="token string">&quot;img&quot;</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+  <span class="token keyword">if</span> <span class="token punctuation">(</span><span class="token operator">!</span>allImgs<span class="token punctuation">.</span>length<span class="token punctuation">)</span> <span class="token punctuation">{</span>
+    <span class="token comment">//没有图片，首屏时间就是DOM加载解析完成时间，不考虑iframe等情况</span>
+    <span class="token keyword">return</span> <span class="token punctuation">(</span>firstScreenTime <span class="token operator">=</span> domContentLoadedTime<span class="token punctuation">)</span><span class="token punctuation">;</span>
+  <span class="token punctuation">}</span>
+  <span class="token comment">// 判断图片是否在首屏，这里写的很简单，效率较低</span>
+  <span class="token keyword">for</span> <span class="token punctuation">(</span><span class="token keyword">let</span> i <span class="token operator">=</span> <span class="token number">0</span><span class="token punctuation">;</span> i <span class="token operator">&lt;</span> allImgs<span class="token punctuation">.</span>length<span class="token punctuation">;</span> i<span class="token operator">++</span><span class="token punctuation">)</span> <span class="token punctuation">{</span>
+    <span class="token keyword">let</span> img <span class="token operator">=</span> allImgs<span class="token punctuation">[</span>i<span class="token punctuation">]</span><span class="token punctuation">;</span>
+    <span class="token keyword">if</span> <span class="token punctuation">(</span><span class="token operator">!</span>img<span class="token punctuation">.</span>src<span class="token punctuation">)</span> <span class="token punctuation">{</span>
+      <span class="token keyword">continue</span><span class="token punctuation">;</span>
+    <span class="token punctuation">}</span>
+    <span class="token keyword">let</span> imgOffsetTop <span class="token operator">=</span> <span class="token function">getEleOffsetTop</span><span class="token punctuation">(</span>img<span class="token punctuation">)</span><span class="token punctuation">;</span>
+    <span class="token keyword">if</span> <span class="token punctuation">(</span>imgOffsetTop <span class="token operator">&lt;</span> fistScreenHeight<span class="token punctuation">)</span> <span class="token punctuation">{</span>
+      firstScreenImgs<span class="token punctuation">.</span><span class="token function">push</span><span class="token punctuation">(</span><span class="token punctuation">{</span>
+        img<span class="token punctuation">,</span>
+        loaded<span class="token operator">:</span> <span class="token boolean">false</span><span class="token punctuation">,</span>
+      <span class="token punctuation">}</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+    <span class="token punctuation">}</span>
+  <span class="token punctuation">}</span>
+  <span class="token comment">//判断是否都加载完毕</span>
+  <span class="token keyword">const</span> timer <span class="token operator">=</span> <span class="token function">setInterval</span><span class="token punctuation">(</span><span class="token punctuation">(</span><span class="token punctuation">)</span> <span class="token operator">=&gt;</span> <span class="token punctuation">{</span>
+    <span class="token keyword">if</span> <span class="token punctuation">(</span>firstScreenImgs<span class="token punctuation">.</span>length<span class="token punctuation">)</span> <span class="token punctuation">{</span>
+      <span class="token keyword">for</span> <span class="token punctuation">(</span><span class="token keyword">let</span> i <span class="token operator">=</span> <span class="token number">0</span><span class="token punctuation">;</span> i <span class="token operator">&lt;</span> firstScreenImgs<span class="token punctuation">.</span>length<span class="token punctuation">;</span> i<span class="token operator">++</span><span class="token punctuation">)</span> <span class="token punctuation">{</span>
+        <span class="token keyword">if</span> <span class="token punctuation">(</span><span class="token operator">!</span>firstScreenImgs<span class="token punctuation">[</span>i<span class="token punctuation">]</span><span class="token punctuation">.</span>complete<span class="token punctuation">)</span> <span class="token punctuation">{</span>
+          allImgLoaded <span class="token operator">=</span> <span class="token boolean">false</span><span class="token punctuation">;</span>
+          <span class="token keyword">break</span><span class="token punctuation">;</span>
+        <span class="token punctuation">}</span> <span class="token keyword">else</span> <span class="token punctuation">{</span>
+          allImgLoaded <span class="token operator">=</span> <span class="token boolean">true</span><span class="token punctuation">;</span>
+        <span class="token punctuation">}</span>
+      <span class="token punctuation">}</span>
+    <span class="token punctuation">}</span> <span class="token keyword">else</span> <span class="token punctuation">{</span>
+      allImgLoaded <span class="token operator">=</span> <span class="token boolean">true</span><span class="token punctuation">;</span>
+    <span class="token punctuation">}</span>
+    <span class="token keyword">if</span> <span class="token punctuation">(</span>allImgLoaded<span class="token punctuation">)</span> <span class="token punctuation">{</span>
+      firstScreenTime <span class="token operator">=</span> <span class="token operator">+</span><span class="token keyword">new</span> <span class="token class-name">Date</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+      <span class="token function">clearInterval</span><span class="token punctuation">(</span>timer<span class="token punctuation">)</span><span class="token punctuation">;</span>
+    <span class="token punctuation">}</span>
+  <span class="token punctuation">}</span><span class="token punctuation">,</span> <span class="token number">0</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+<span class="token punctuation">}</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+</code></pre></div><h3 id="可操作和总下载时间">可操作和总下载时间</h3> <p>可操作性时间以 domready 为准,基本可以认为是 DOMContentLoaded 的时间。</p> <p>总下载时间可以统计 onload 的时间,即所有同步资源都加载完成，如果存在很多异步渲染，则需要将所有异步加载完成的时间作为总下载时间。</p></div></article></section><div class="global-ui"></div></div>
+    <script src="/blog/assets/js/app.e844dcec.js" defer></script><script src="/blog/assets/js/3.cde5f00a.js" defer></script><script src="/blog/assets/js/8.1c0b63e6.js" defer></script>
+  </body>
+</html>
