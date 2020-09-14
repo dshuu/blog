@@ -1,0 +1,51 @@
+<!DOCTYPE html>
+<html lang="en-US">
+  <head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width,initial-scale=1">
+    <title>Js中异步与EventLoop机制 | YOLO</title>
+    <meta name="generator" content="VuePress 1.5.4">
+    <meta name="viewport" content="width=device-width,initial-scale=1.0">
+    <!-- <link href="//cdn.bootcss.com/font-awesome/4.5.0/css/font-awesome.min.css" rel="stylesheet"> -->
+    
+    <meta name="description" content="dshu`s blog">
+    <link rel="preload" href="/blog/assets/css/0.styles.2a2a5349.css" as="style"><link rel="preload" href="/blog/assets/js/app.8878a103.js" as="script"><link rel="preload" href="/blog/assets/js/3.cde5f00a.js" as="script"><link rel="preload" href="/blog/assets/js/8.4b839f87.js" as="script"><link rel="prefetch" href="/blog/assets/js/10.a0d2003d.js"><link rel="prefetch" href="/blog/assets/js/2.60e3e3a8.js"><link rel="prefetch" href="/blog/assets/js/4.0c84c48a.js"><link rel="prefetch" href="/blog/assets/js/5.111f1b2a.js"><link rel="prefetch" href="/blog/assets/js/6.b562210e.js"><link rel="prefetch" href="/blog/assets/js/7.3f9f874c.js"><link rel="prefetch" href="/blog/assets/js/9.524cdf08.js">
+    <link rel="stylesheet" href="/blog/assets/css/0.styles.2a2a5349.css">
+  </head>
+  <body>
+    <div id="app" data-server-rendered="true"><section class="post-detail wrapper"><article><header><h1 id="post-title">Js中异步与EventLoop机制</h1> <div class="post-info"><span><i aria-hidden="true" class="fa fa-clock-o"></i>2020-09-01</span> <span><i aria-hidden="true" class="fa fa-tags"></i>技术</span></div></header> <section class="post-content"></section> <div class="content__default"><h3 id="什么是同步与异步">什么是同步与异步</h3> <p>同步就是做完一件事儿后，就知道结果。</p> <p>异步是干完一件事儿，念念不忘，必有回响。</p> <p>以代码为例</p> <div class="language-js extra-class"><pre class="language-js"><code><span class="token comment">//同步</span>
+<span class="token keyword">const</span> <span class="token function-variable function">test</span> <span class="token operator">=</span> <span class="token punctuation">(</span><span class="token punctuation">)</span> <span class="token operator">=&gt;</span> <span class="token punctuation">{</span>
+  <span class="token keyword">const</span> s <span class="token operator">=</span> <span class="token operator">+</span><span class="token keyword">new</span> <span class="token class-name">Date</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+  <span class="token keyword">while</span> <span class="token punctuation">(</span><span class="token boolean">true</span><span class="token punctuation">)</span> <span class="token punctuation">{</span>
+    <span class="token keyword">if</span> <span class="token punctuation">(</span><span class="token operator">+</span><span class="token keyword">new</span> <span class="token class-name">Date</span><span class="token punctuation">(</span><span class="token punctuation">)</span> <span class="token operator">-</span> s <span class="token operator">&gt;=</span> <span class="token number">2000</span><span class="token punctuation">)</span> <span class="token punctuation">{</span>
+      <span class="token keyword">break</span><span class="token punctuation">;</span>
+    <span class="token punctuation">}</span>
+  <span class="token punctuation">}</span>
+<span class="token punctuation">}</span><span class="token punctuation">;</span>
+console<span class="token punctuation">.</span><span class="token function">log</span><span class="token punctuation">(</span><span class="token string">&quot;1&quot;</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+<span class="token function">test</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">;</span> <span class="token comment">//同步，等执行完再下一步</span>
+console<span class="token punctuation">.</span><span class="token function">log</span><span class="token punctuation">(</span><span class="token string">&quot;2&quot;</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+
+<span class="token comment">//最终先打印'1'等2秒后再打印'2',同步情况下，你得等别人完事儿了，才能轮到你</span>
+</code></pre></div><div class="language-js extra-class"><pre class="language-js"><code><span class="token comment">//异步</span>
+console<span class="token punctuation">.</span><span class="token function">log</span><span class="token punctuation">(</span><span class="token string">&quot;1&quot;</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+<span class="token function">setTimeout</span><span class="token punctuation">(</span><span class="token punctuation">(</span><span class="token punctuation">)</span> <span class="token operator">=&gt;</span> <span class="token punctuation">{</span>
+  console<span class="token punctuation">.</span><span class="token function">log</span><span class="token punctuation">(</span><span class="token string">&quot;exec&quot;</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+<span class="token punctuation">}</span><span class="token punctuation">,</span> <span class="token number">2000</span><span class="token punctuation">)</span><span class="token punctuation">;</span> <span class="token comment">//这里会执行，但是不等</span>
+console<span class="token punctuation">.</span><span class="token function">log</span><span class="token punctuation">(</span><span class="token string">&quot;2&quot;</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+<span class="token comment">//最终先打印'1'&gt;&gt;'2'&gt;&gt;2s后打印'exec'</span>
+</code></pre></div><p>实际上，我们碰到的异步场景不只是定时器，同步异步任务执行的顺序是 JS 执行环境 EventLoop 决定的</p> <h3 id="浏览器端的-event-loop">浏览器端的 Event Loop</h3> <div class="language-js extra-class"><pre class="language-js"><code><span class="token comment">// 上代码</span>
+console<span class="token punctuation">.</span><span class="token function">log</span><span class="token punctuation">(</span><span class="token string">&quot;1&quot;</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+<span class="token function">setTimeout</span><span class="token punctuation">(</span><span class="token punctuation">(</span><span class="token punctuation">)</span> <span class="token operator">=&gt;</span> <span class="token punctuation">{</span>
+  console<span class="token punctuation">.</span><span class="token function">log</span><span class="token punctuation">(</span><span class="token string">&quot;2&quot;</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+<span class="token punctuation">}</span><span class="token punctuation">,</span> <span class="token number">0</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+Promise<span class="token punctuation">.</span><span class="token function">resolve</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">.</span><span class="token function">then</span><span class="token punctuation">(</span><span class="token punctuation">(</span><span class="token punctuation">)</span> <span class="token operator">=&gt;</span> <span class="token punctuation">{</span>
+  console<span class="token punctuation">.</span><span class="token function">log</span><span class="token punctuation">(</span><span class="token string">&quot;3&quot;</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+<span class="token punctuation">}</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+console<span class="token punctuation">.</span><span class="token function">log</span><span class="token punctuation">(</span><span class="token string">&quot;4&quot;</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+
+<span class="token comment">//结果是 1&gt;&gt;4&gt;&gt;3&gt;&gt;2</span>
+</code></pre></div><p>按照之前同步的思路，不应该是 setTimeout 先嘛，为啥反而是 Promise 先执行，难道你 Promise 姓赵。</p> <p>同样是异步，但是大家的层级还真不一样</p> <h3 id="nodejs-的-event-loop">NodeJs 的 Event Loop</h3> <p>NodeJs以非阻塞的IO单线程,其核心在于Libuv</p></div></article></section><div class="global-ui"></div></div>
+    <script src="/blog/assets/js/app.8878a103.js" defer></script><script src="/blog/assets/js/3.cde5f00a.js" defer></script><script src="/blog/assets/js/8.4b839f87.js" defer></script>
+  </body>
+</html>
